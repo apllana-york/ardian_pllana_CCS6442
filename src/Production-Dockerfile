@@ -1,5 +1,5 @@
-FROM citycase/assessment2:1.0
-RUN apk add --no-cache postgresql17-client
+FROM citycase/assessment2:2.0
+RUN apk add --no-cache postgresql-client
 COPY  checkstatus.sh  /usr/local/bin/checkstatus.sh
 RUN chmod +x /usr/local/bin/checkstatus.sh
 CMD ["/usr/local/bin/checkstatus.sh"]
