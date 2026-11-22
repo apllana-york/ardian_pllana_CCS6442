@@ -87,9 +87,10 @@ Since the changes were already pushed and PR was created, I thought it would be 
 ### Creating postgres image
 1. Created `.env` file containing `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` and `POSTGRES_PORT`.
 2. Edited `docker-compose.yml` to pull values from the `.env` file.
-3. `.env` is listed in `.gitignore` so credentials are never committed.
-4. First decided to create with version 18 postgres but faced some issues since they changed the volume paths. Decided to continue with 17 since this was before that change.
-5. Tested the service by running `docker compose up -d postgres` command.
+3. Replaced the `db` service with a postgres service using `postgres:17-alpine` image, and updated the app service's `DATABASE_URL` host and `depends_on` to use it.
+4. `.env` is listed in `.gitignore` so credentials are never committed.
+5. First decided to create with version 18 postgres but faced some issues since they changed the volume paths. Decided to continue with 17 since this was before that change.
+6. Tested the service by running `docker compose up -d postgres` command.
 ```
 linkplus@Dobby-Macbook fastapi-realworld-example-app % docker compose up -d postgres
 [+] Running 1/1
@@ -107,8 +108,8 @@ linkplus@Dobby-Macbook fastapi-realworld-example-app % docker compose up -d post
 3. Used an `until` loop to retry every 2 seconds until `pg_isready` returns `0`.
 4. While testing, I noticed that `username`, `password` and `db` are redundant, only `host` and `port` are required for `pg_isready`.
 ```
-linkplus@Dobby-Macbook fastapi-realworld-example-app % POSTGRES_HOST=postgres POSTGRES_PORT=5432 sh src/checkstatus.sh
-Waiting for database at postgres:5432...
+linkplus@Dobby-Macbook fastapi-realworld-example-app % POSTGRES_HOST=localhost POSTGRES_PORT=5432 sh src/checkstatus.sh
+Waiting for database at localhost:5432...
 Database is ready!
 ```
 
@@ -152,9 +153,10 @@ fastapi-realworld-example-app-checkstatus-1 exited with code 0
 
 ### Getting ready for production
 1. Merged all features and PRs including `step-5` that never got merged from Part 1.
-2. Created `release/2.0.0` branch.
-3. Created release PR, approved it and left the screenshot as a comment, then merged it.
-4. Tagged release, merged release back to develop
+2. Created `release/2.0.0` branch, incremented to `v.2` because the changes break previous functionality like renaming service.
+3. Changed `FROM alpine:3.24` in `Production-Dockerfile` to `FROM citycase/assessment2:1.0`.
+4. Created release PR, approved it and left the screenshot as a comment, then merged it.
+5. Tagged `master` with `Release-v.2.0.0`, merged release back to develop
 
 ### A grave mistake
 1. Created `hotfix/2.0.1` from `master`, a patch bump because it is an urgent production fix with no new features.
